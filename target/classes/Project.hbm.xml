@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Sep 13, 2016 3:59:00 AM by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="org.services.entities.Project" table="PROJECT">
+        <id name="projectId" type="long">
+            <column name="PROJECTID" />
+            <generator class="assigned" />
+        </id>
+        <property name="projectName" type="java.lang.String">
+            <column name="PROJECTNAME" />
+        </property>
+        <property name="projectBudget" type="double">
+            <column name="PROJECTBUDGET" />
+        </property>
+        <property name="amountCollected" type="double">
+            <column name="AMOUNTCOLLECTED" />
+        </property>
+        <set name="donorList" table="DONOR" cascade="all" inverse="false" lazy="true" >
+            <key>
+                <column name="PROJECTID" />
+            </key>
+            <one-to-many class="org.services.entities.Donor" />
+        </set>
+    </class>
+</hibernate-mapping>

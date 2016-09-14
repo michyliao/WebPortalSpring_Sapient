@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+
+	<context:annotation-config />
+	<context:component-scan base-package="org.services" />
+
+
+	<bean id="template" class="org.springframework.jdbc.core.JdbcTemplate"
+		p:dataSource-ref="dataSrc" />
+
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate"
+		p:sessionFactory-ref="sessionFactory" />
+
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"
+		p:dataSource-ref="dataSrc">
+		<property name="mappingResources">
+			<list>
+				<value>Donor.hbm.xml</value>
+				<value>Address.hbm.xml</value>
+				<value>Project.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.OracleDialect</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- DB Connection -->
+	<bean id="propertyConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		p:location="classpath:DbConnection.properties" />
+
+	<bean id="dataSrc"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		p:driverClassName="${db.driverClass}" p:username="${db.userName}"
+		p:password="${db.password}" p:url="${db.driverURL}" />
+
+	<!-- <bean id="donorMapper" class="org.springframework.jdbc.core.BeanPropertyRowMapper" 
+		p:mappedClass="org.services.entities.Donor" /> <bean id="projectMapper" class="org.springframework.jdbc.core.BeanPropertyRowMapper" 
+		p:mappedClass="org.services.entities.Project" /> -->
+
+	<!-- Collection of Donors -->
+
+	<!-- Setter Dependency -->
+	<bean id="addressBean1" class="org.services.entities.Address">
+		<property name="addressId" value="987000000"/>
+		<property name="addressLine1" value="35 Bastion St." />
+		<property name="addressLine2" value="Unit 1001" />
+		<property name="cityName" value="Toronto" />
+		<property name="pinCode" value="98760" />
+	</bean>
+
+	<bean id="addressBean2" class="org.services.entities.Address">
+		<property name="addressId" value="123000000"/>
+		<property name="addressLine1" value="832 Bay St" />
+		<property name="addressLine2" value="Unit 2901" />
+		<property name="cityName" value="Toronto" />
+		<property name="pinCode" value="34531" />
+	</bean>
+
+	<!-- Construct Dependency by Name -->
+	<bean id="donorBean1" class="org.services.entities.Donor">
+		<constructor-arg name="donorId" value="10900000" />
+		<constructor-arg name="donorName" value="Michelle" />
+		<constructor-arg name="email" value="michelle@mail.com" />
+		<constructor-arg name="handPhone" value="1234567890" />
+		<constructor-arg name="address" ref="addressBean1" />
+	</bean>
+
+	<!-- Constructor Dependency using Namespace -->
+	<bean id="donorBean2" class="org.services.entities.Donor"
+		c:donorId="208000000" c:donorName="Alex" c:email="alex@mail.com"
+		c:handPhone="6054987123" c:address-ref="addressBean2" />
+
+	<!-- Setter Dependency with Namespace -->
+	<bean id="Project" class="org.services.entities.Project"
+		p:projectId="90000000" p:projectName="Mental Health Awareness"
+		p:projectBudget="1000.00" p:amountCollected="540.00">
+
+		<property name="donorList">
+			<list value-type="org.services.entities.Donor">
+				<ref bean="donorBean1" />
+				<ref bean="donorBean2" />
+			</list>
+		</property>
+	</bean>
+
+</beans>
